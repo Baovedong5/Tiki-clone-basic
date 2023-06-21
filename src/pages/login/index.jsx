@@ -1,8 +1,34 @@
 import { Button, Divider, Form, Input, message, notification } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import "./login.scss";
+import { useState } from "react";
+import { callLogin } from "../../service/apiService";
 
 const LoginPage = () => {
+  const navigate = useNavigate();
+  const [isSubmit, setIsSubmit] = useState(false);
+
+  const onFinish = async (values) => {
+    const { username, password } = values;
+    setIsSubmit(true);
+    const res = await callLogin(username, password);
+    setIsSubmit(false);
+    if (res?.data) {
+      localStorage.setItem("access_token", res.data.access_token);
+      message.success("Đăng nhập thành công");
+      navigate("/");
+    } else {
+      notification.error({
+        message: "Có lỗi xảy ra",
+        description:
+          res.message && Array.isArray(res.message)
+            ? res.message[0]
+            : res.message,
+        duration: 5,
+      });
+    }
+  };
+
   return (
     <div className="login-page">
       <main className="main">
@@ -12,12 +38,7 @@ const LoginPage = () => {
               <h2 className="text text-large">Đăng Nhập</h2>
               <Divider />
             </div>
-            <Form
-              name="basic"
-              // style={{ maxWidth: 600, margin: '0 auto' }}
-              // onFinish={onFinish}
-              autoComplete="off"
-            >
+            <Form name="basic" onFinish={onFinish} autoComplete="off">
               <Form.Item
                 labelCol={{ span: 24 }} //whole column
                 label="Email"
@@ -43,8 +64,7 @@ const LoginPage = () => {
               <Form.Item
               // wrapperCol={{ offset: 6, span: 16 }}
               >
-                <Button type="primary" htmlType="submit">
-                  {/* loading={isSubmit} */}
+                <Button type="primary" htmlType="submit" loading={isSubmit}>
                   Đăng nhập
                 </Button>
               </Form.Item>
