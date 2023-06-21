@@ -12,3 +12,7 @@ export const callRegister = (fullName, email, password, phone) => {
 export const callLogin = (username, password) => {
   return axios.post("/api/v1/auth/login", { username, password, delay: 2000 });
 };
+
+export const callFetchAccount = () => {
+  return axios.get("/api/v1/auth/account");
+};
