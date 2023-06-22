@@ -8,6 +8,8 @@ import { DownOutlined } from "@ant-design/icons";
 import { Dropdown, Space } from "antd";
 import { useNavigate } from "react-router";
 import "./header.scss";
+import { callLogout } from "../../service/apiService";
+import { doLogoutAction } from "../../redux/account/accountSlice";
 
 const Header = () => {
   const [openDrawer, setOpenDrawer] = useState(false);
@@ -16,13 +18,26 @@ const Header = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+  const handleLogout = async () => {
+    const res = await callLogout();
+    if (res && res.data) {
+      dispatch(doLogoutAction());
+      message.success("Đăng xuất thàng công");
+      navigate("/");
+    }
+  };
+
   const items = [
     {
       label: <label style={{ cursor: "pointer" }}>Quản lý tài khoản</label>,
       key: "account",
     },
     {
-      label: <label style={{ cursor: "pointer" }}>Đăng xuất</label>,
+      label: (
+        <label style={{ cursor: "pointer" }} onClick={() => handleLogout()}>
+          Đăng xuất
+        </label>
+      ),
       key: "logout",
     },
   ];

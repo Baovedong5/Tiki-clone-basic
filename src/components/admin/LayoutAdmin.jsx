@@ -15,6 +15,8 @@ import { Link } from "react-router-dom";
 import "./layout.scss";
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { callLogout } from "../../service/apiService";
+import { doLogoutAction } from "../../redux/account/accountSlice";
 
 const { Content, Footer, Sider } = Layout;
 
@@ -61,6 +63,15 @@ const LayoutAdmin = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+  const handleLogout = async () => {
+    const res = await callLogout();
+    if (res && res.data) {
+      dispatch(doLogoutAction());
+      message.success("Đăng xuất thàng công");
+      navigate("/");
+    }
+  };
+
   const itemsDropdown = [
     {
       label: <label style={{ cursor: "pointer" }}>Quản lý tài khoản</label>,
@@ -68,10 +79,7 @@ const LayoutAdmin = () => {
     },
     {
       label: (
-        <label
-          style={{ cursor: "pointer" }}
-          // onClick={() => handleLogout()}
-        >
+        <label style={{ cursor: "pointer" }} onClick={() => handleLogout()}>
           Đăng xuất
         </label>
       ),
@@ -126,5 +134,4 @@ const LayoutAdmin = () => {
     </Layout>
   );
 };
-
 export default LayoutAdmin;
