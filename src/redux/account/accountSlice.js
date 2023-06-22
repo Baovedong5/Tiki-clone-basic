@@ -22,7 +22,7 @@ export const accountSlice = createSlice({
     },
 
     doGetAccountAction: (state, action) => {
-      (state.isAuthenticated = true), (state.user = action.payload);
+      (state.isAuthenticated = true), (state.user = action.payload.user);
     },
   },
 });
