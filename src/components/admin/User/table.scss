@@ -1,0 +1,14 @@
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  margin: 15px;
+
+  .title {
+    font-size: 15px;
+    font-weight: bold;
+  }
+
+  .btn {
+    margin-right: 10px;
+  }
+}
