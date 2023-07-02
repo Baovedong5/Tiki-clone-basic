@@ -9,6 +9,7 @@ import {
   ReloadOutlined,
 } from "@ant-design/icons";
 import "./table.scss";
+import UserViewDetail from "./UserViewDetail";
 
 const UserTable = () => {
   const [listUser, setListUser] = useState([]);
@@ -20,6 +21,9 @@ const UserTable = () => {
   const [filter, setFilter] = useState("");
   const [sortQuery, setSortQuery] = useState("");
 
+  const [dataViewDetail, setDataViewDetail] = useState({});
+  const [openViewDetail, setOpenViewDetail] = useState(false);
+
   useEffect(() => {
     fetchUser();
   }, [current, pageSize, filter, sortQuery]);
@@ -27,7 +31,21 @@ const UserTable = () => {
   const columns = [
     {
       title: "Id",
-      dataIndex: "_id",
+      // dataIndex: "_id",
+      render: (text, record, index) => {
+        console.log(">>> record", record);
+        return (
+          <a
+            href="#"
+            onClick={() => {
+              setDataViewDetail(record);
+              setOpenViewDetail(true);
+            }}
+          >
+            {record._id}
+          </a>
+        );
+      },
     },
     {
       title: "Tên hiển thị",
@@ -130,7 +148,7 @@ const UserTable = () => {
         </Col>
         <Col span={24}>
           <Table
-            style={{ margin: "15px" }}
+            style={{ margin: "15px", marginTop: "0px" }}
             caption={renderHeader}
             loading={isLoading}
             columns={columns}
@@ -141,10 +159,24 @@ const UserTable = () => {
               current: current,
               pageSize: pageSize,
               total: total,
+              showTotal: (total, range) => {
+                return (
+                  <div>
+                    {range[0]} - {range[1]} trên {total} row
+                  </div>
+                );
+              },
             }}
           />
         </Col>
       </Row>
+
+      <UserViewDetail
+        dataViewDetail={dataViewDetail}
+        setDataViewDetail={setDataViewDetail}
+        openViewDetail={openViewDetail}
+        setOpenViewDetail={setOpenViewDetail}
+      />
     </>
   );
 };

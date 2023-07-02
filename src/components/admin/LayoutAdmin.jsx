@@ -1,7 +1,6 @@
 import {
   AppstoreOutlined,
   ExceptionOutlined,
-  HeartTwoTone,
   TeamOutlined,
   UserOutlined,
   DollarCircleOutlined,
@@ -9,7 +8,7 @@ import {
   MenuUnfoldOutlined,
   DownOutlined,
 } from "@ant-design/icons";
-import { Layout, Menu, Dropdown, Space, message } from "antd";
+import { Layout, Menu, Dropdown, Space, message, Avatar } from "antd";
 import { Outlet, useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import "./layout.scss";
@@ -79,6 +78,14 @@ const LayoutAdmin = () => {
     },
     {
       label: (
+        <label style={{ cursor: "pointer" }} onClick={() => navigate("/")}>
+          Trang chủ
+        </label>
+      ),
+      key: "home",
+    },
+    {
+      label: (
         <label style={{ cursor: "pointer" }} onClick={() => handleLogout()}>
           Đăng xuất
         </label>
@@ -86,6 +93,10 @@ const LayoutAdmin = () => {
       key: "logout",
     },
   ];
+
+  const urlAvatar = `${import.meta.env.VITE_BACKEND_URL}/images/avatar/${
+    user?.avatar
+  }`;
 
   return (
     <Layout style={{ minHeight: "100vh" }} className="layout-admin">
@@ -118,8 +129,8 @@ const LayoutAdmin = () => {
           <Dropdown menu={{ items: itemsDropdown }} trigger={["click"]}>
             <a onClick={(e) => e.preventDefault()}>
               <Space>
-                Welcome {user?.fullName}
-                <DownOutlined />
+                <Avatar src={urlAvatar} />
+                {user?.fullName}
               </Space>
             </a>
           </Dropdown>

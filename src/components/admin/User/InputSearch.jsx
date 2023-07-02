@@ -26,7 +26,11 @@ const InputSearch = (props) => {
   };
 
   return (
-    <Form form={form} onFinish={onFinish} style={{ margin: "13px" }}>
+    <Form
+      form={form}
+      onFinish={onFinish}
+      style={{ margin: "13px", marginBottom: "0px", marginTop: "0px" }}
+    >
       <Row gutter={24}>
         <Col span={8}>
           <Form.Item label={"Name"} name={"fullName"} labelCol={{ span: 24 }}>
