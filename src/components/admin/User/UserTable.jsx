@@ -10,6 +10,10 @@ import {
 } from "@ant-design/icons";
 import "./table.scss";
 import UserViewDetail from "./UserViewDetail";
+import ModalCreateUser from "./ModalCreateUser";
+import UserImport from "./data/UserImport";
+import moment from "moment";
+import * as XLSX from "xlsx";
 
 const UserTable = () => {
   const [listUser, setListUser] = useState([]);
@@ -24,6 +28,10 @@ const UserTable = () => {
   const [dataViewDetail, setDataViewDetail] = useState({});
   const [openViewDetail, setOpenViewDetail] = useState(false);
 
+  const [openModal, setOpenModal] = useState(false);
+
+  const [openModalImport, setOpenModalImport] = useState(false);
+
   useEffect(() => {
     fetchUser();
   }, [current, pageSize, filter, sortQuery]);
@@ -33,7 +41,6 @@ const UserTable = () => {
       title: "Id",
       // dataIndex: "_id",
       render: (text, record, index) => {
-        console.log(">>> record", record);
         return (
           <a
             href="#"
@@ -63,6 +70,14 @@ const UserTable = () => {
       sorter: true,
     },
     {
+      title: "Ngày cập nhật",
+      dataIndex: "updatedAt",
+      sorter: true,
+      render: (text, record, index) => {
+        return <>{moment(record.updatedAt).format("DD-MM-YYYY HH:mm:ss")}</>;
+      },
+    },
+    {
       title: "Action",
       render: (text, record, index) => {
         return (
@@ -78,13 +93,32 @@ const UserTable = () => {
     <div className="table-header">
       <div className="title">Table List Users</div>
       <div>
-        <Button className="btn" type="primary" icon={<ImportOutlined />}>
+        <Button
+          className="btn"
+          type="primary"
+          icon={<ImportOutlined />}
+          onClick={() => {
+            setOpenModalImport(true);
+          }}
+        >
           Import
         </Button>
-        <Button className="btn" type="primary" icon={<ExportOutlined />}>
+        <Button
+          className="btn"
+          type="primary"
+          icon={<ExportOutlined />}
+          onClick={() => handleExportData()}
+        >
           Export
         </Button>
-        <Button className="btn" type="primary" icon={<PlusOutlined />}>
+        <Button
+          className="btn"
+          type="primary"
+          icon={<PlusOutlined />}
+          onClick={() => {
+            setOpenModal(true);
+          }}
+        >
           Thêm mới
         </Button>
         <Button
@@ -140,6 +174,15 @@ const UserTable = () => {
     setFilter(query);
   };
 
+  const handleExportData = () => {
+    if (listUser.length > 0) {
+      const worksheet = XLSX.utils.json_to_sheet(listUser);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+      XLSX.writeFile(workbook, "ExportUser.csv");
+    }
+  };
+
   return (
     <>
       <Row gutter={[20, 20]}>
@@ -171,11 +214,23 @@ const UserTable = () => {
         </Col>
       </Row>
 
+      <ModalCreateUser
+        openModal={openModal}
+        setOpenModal={setOpenModal}
+        fetchUser={fetchUser}
+      />
+
       <UserViewDetail
         dataViewDetail={dataViewDetail}
         setDataViewDetail={setDataViewDetail}
         openViewDetail={openViewDetail}
         setOpenViewDetail={setOpenViewDetail}
+      />
+
+      <UserImport
+        openModalImport={openModalImport}
+        setOpenModalImport={setOpenModalImport}
+        fetchUser={fetchUser}
       />
     </>
   );
