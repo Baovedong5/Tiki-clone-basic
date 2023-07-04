@@ -1,12 +1,22 @@
-import { Button, Col, Row, Table } from "antd";
+import {
+  Button,
+  Col,
+  Popconfirm,
+  Row,
+  Table,
+  message,
+  notification,
+} from "antd";
 import { useEffect, useState } from "react";
-import { callFetchListUser } from "../../../service/apiService";
+import { callDeleteUser, callFetchListUser } from "../../../service/apiService";
 import InputSearch from "./InputSearch";
 import {
   PlusOutlined,
   ImportOutlined,
   ExportOutlined,
   ReloadOutlined,
+  EditTwoTone,
+  DeleteTwoTone,
 } from "@ant-design/icons";
 import "./table.scss";
 import UserViewDetail from "./UserViewDetail";
@@ -14,6 +24,7 @@ import ModalCreateUser from "./ModalCreateUser";
 import UserImport from "./data/UserImport";
 import moment from "moment";
 import * as XLSX from "xlsx";
+import ModalUpdateUser from "./ModalUpdateUser";
 
 const UserTable = () => {
   const [listUser, setListUser] = useState([]);
@@ -31,6 +42,9 @@ const UserTable = () => {
   const [openModal, setOpenModal] = useState(false);
 
   const [openModalImport, setOpenModalImport] = useState(false);
+
+  const [openModalUpdate, setOpenModalUpdate] = useState(false);
+  const [dataUpdate, setDataUpdate] = useState({});
 
   useEffect(() => {
     fetchUser();
@@ -82,7 +96,27 @@ const UserTable = () => {
       render: (text, record, index) => {
         return (
           <>
-            <button>Delete</button>
+            <EditTwoTone
+              twoToneColor="#f57800"
+              style={{ cursor: "pointer", margin: "0 10px" }}
+              onClick={() => {
+                setOpenModalUpdate(true);
+                setDataUpdate(record);
+              }}
+            />
+
+            <Popconfirm
+              placement="leftTop"
+              title={"Xác nhận xóa user"}
+              description={"Bạn có chắc muốn xóa user này"}
+              onConfirm={() => handleDeleteUser(record._id)}
+              okText="Xác nhận"
+              cancelText="Hủy"
+            >
+              <span>
+                <DeleteTwoTone twoToneColor="#ff4d4f" />
+              </span>
+            </Popconfirm>
           </>
         );
       },
@@ -183,6 +217,19 @@ const UserTable = () => {
     }
   };
 
+  const handleDeleteUser = async (userId) => {
+    const res = await callDeleteUser(userId);
+    if (res && res.data) {
+      message.success("Xóa user thành công");
+      fetchUser();
+    } else {
+      notification.error({
+        message: "Có lỗi xảy ra",
+        description: res.message,
+      });
+    }
+  };
+
   return (
     <>
       <Row gutter={[20, 20]}>
@@ -218,6 +265,14 @@ const UserTable = () => {
         openModal={openModal}
         setOpenModal={setOpenModal}
         fetchUser={fetchUser}
+      />
+
+      <ModalUpdateUser
+        fetchUser={fetchUser}
+        openModalUpdate={openModalUpdate}
+        setOpenModalUpdate={setOpenModalUpdate}
+        dataUpdate={dataUpdate}
+        setDataUpdate={setDataUpdate}
       />
 
       <UserViewDetail
