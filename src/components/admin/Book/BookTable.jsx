@@ -10,6 +10,8 @@ import {
   ReloadOutlined,
 } from "@ant-design/icons";
 import { callFetchBook } from "../../../service/apiBook";
+import BookViewDetail from "./BookViewDetail";
+import ModalCreateBook from "./ModalCreateBook";
 
 const BookTable = () => {
   const [listBook, setListBook] = useState([]);
@@ -22,11 +24,26 @@ const BookTable = () => {
   const [filter, setFilter] = useState("");
   const [sortQuery, setSortQuery] = useState("");
 
+  const [openDetail, setOpenDetail] = useState(false);
+  const [dataDetail, setDataDetail] = useState({});
+
+  const [openModal, setOpenModal] = useState(false);
+
   const columns = [
     {
       title: "Id",
       render: (text, record, index) => {
-        return <a href="#">{record._id}</a>;
+        return (
+          <a
+            href="#"
+            onClick={() => {
+              setOpenDetail(true);
+              setDataDetail(record);
+            }}
+          >
+            {record._id}
+          </a>
+        );
       },
     },
     {
@@ -87,7 +104,12 @@ const BookTable = () => {
         <Button className="btn" type="primary" icon={<ExportOutlined />}>
           Export
         </Button>
-        <Button className="btn" type="primary" icon={<PlusOutlined />}>
+        <Button
+          className="btn"
+          type="primary"
+          icon={<PlusOutlined />}
+          onClick={() => setOpenModal(true)}
+        >
           Thêm mới
         </Button>
         <Button
@@ -176,6 +198,18 @@ const BookTable = () => {
           />
         </Col>
       </Row>
+      <BookViewDetail
+        openDetail={openDetail}
+        setOpenDetail={setOpenDetail}
+        dataDetail={dataDetail}
+        setDataDetail={setDataDetail}
+      />
+
+      <ModalCreateBook
+        openModal={openModal}
+        setOpenModal={setOpenModal}
+        fetchBook={fetchBook}
+      />
     </>
   );
 };
