@@ -195,7 +195,6 @@ const UserTable = () => {
       setCurrent(1);
     }
     if (sorter && sorter.field) {
-      console.log("sort", sorter);
       const q =
         sorter.order === "ascend"
           ? `sort=${sorter.field}`
