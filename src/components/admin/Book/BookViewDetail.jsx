@@ -73,6 +73,12 @@ const BookViewDetail = (props) => {
           <Descriptions.Item label="Giá tiền">
             {dataDetail?.price}
           </Descriptions.Item>
+          <Descriptions.Item label="Số lượng">
+            {dataDetail?.quantity}
+          </Descriptions.Item>
+          <Descriptions.Item label="Đã bán">
+            {dataDetail?.sold}
+          </Descriptions.Item>
           <Descriptions.Item label="Thể loại" span={2}>
             <Badge status="processing" text={dataDetail?._id} />
           </Descriptions.Item>

@@ -1,4 +1,12 @@
-import { Button, Col, Row, Table, message } from "antd";
+import {
+  Button,
+  Col,
+  Popconfirm,
+  Row,
+  Table,
+  message,
+  notification,
+} from "antd";
 import { useEffect, useState } from "react";
 import moment from "moment";
 import InputSearchBook from "./InputSearchBook";
@@ -9,9 +17,11 @@ import {
   PlusOutlined,
   ReloadOutlined,
 } from "@ant-design/icons";
-import { callFetchBook } from "../../../service/apiBook";
+import { callDeleteBook, callFetchBook } from "../../../service/apiBook";
 import BookViewDetail from "./BookViewDetail";
 import ModalCreateBook from "./ModalCreateBook";
+import ModalUpdateBook from "./ModalUpdateBook";
+import * as XLSX from "xlsx";
 
 const BookTable = () => {
   const [listBook, setListBook] = useState([]);
@@ -22,12 +32,15 @@ const BookTable = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const [filter, setFilter] = useState("");
-  const [sortQuery, setSortQuery] = useState("");
+  const [sortQuery, setSortQuery] = useState("sort=-updatedAt");
 
   const [openDetail, setOpenDetail] = useState(false);
   const [dataDetail, setDataDetail] = useState({});
 
   const [openModal, setOpenModal] = useState(false);
+
+  const [openModalUpdate, setOpenModalUpdate] = useState(false);
+  const [dataUpdate, setDataUpdate] = useState({});
 
   const columns = [
     {
@@ -82,9 +95,24 @@ const BookTable = () => {
             <EditTwoTone
               twoToneColor="#f57800"
               style={{ cursor: "pointer", margin: "0 10px" }}
+              onClick={() => {
+                setDataUpdate(record);
+                setOpenModalUpdate(true);
+              }}
             />
 
-            <DeleteTwoTone twoToneColor="#ff4d4f" />
+            <Popconfirm
+              placement="leftTop"
+              title={"Xác nhận xóa sách"}
+              description={"Bạn có chắc muốn xóa quyển sách này"}
+              onConfirm={() => handleDeleteBook(record._id)}
+              okText="Xác nhận"
+              cancelText="Hủy"
+            >
+              <span>
+                <DeleteTwoTone twoToneColor="#ff4d4f" />
+              </span>
+            </Popconfirm>
           </>
         );
       },
@@ -101,7 +129,12 @@ const BookTable = () => {
     >
       <div>Table List Books</div>
       <div style={{ display: "flex", gap: "14px" }}>
-        <Button className="btn" type="primary" icon={<ExportOutlined />}>
+        <Button
+          className="btn"
+          type="primary"
+          icon={<ExportOutlined />}
+          onClick={() => handleExportDataBook()}
+        >
           Export
         </Button>
         <Button
@@ -117,7 +150,7 @@ const BookTable = () => {
           type="ghost"
           onClick={() => {
             setFilter("");
-            setSortQuery("");
+            setSortQuery("sort=-updatedAt");
           }}
         >
           <ReloadOutlined />
@@ -168,6 +201,33 @@ const BookTable = () => {
     setFilter(query);
   };
 
+  const handleDeleteBook = async (_id) => {
+    const res = await callDeleteBook(_id);
+    if (res && res.data) {
+      message.success("xóa sách thành công");
+      fetchBook();
+    } else {
+      notification.error({
+        message: "Đã có lỗi xảy ra",
+        description: res.message,
+      });
+    }
+  };
+
+  const handleExportDataBook = () => {
+    const listBookExport = listBook.map((book) => {
+      const { _id, thumbnail, slider, ...rest } = book;
+      return rest;
+    });
+
+    if (listBookExport.length > 0) {
+      const worksheet = XLSX.utils.json_to_sheet(listBookExport);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+      XLSX.writeFile(workbook, "ExportBook.csv");
+    }
+  };
+
   return (
     <>
       <Row gutter={[20, 20]}>
@@ -208,6 +268,14 @@ const BookTable = () => {
       <ModalCreateBook
         openModal={openModal}
         setOpenModal={setOpenModal}
+        fetchBook={fetchBook}
+      />
+
+      <ModalUpdateBook
+        openModalUpdate={openModalUpdate}
+        setOpenModalUpdate={setOpenModalUpdate}
+        dataUpdate={dataUpdate}
+        setDataUpdate={setDataUpdate}
         fetchBook={fetchBook}
       />
     </>
