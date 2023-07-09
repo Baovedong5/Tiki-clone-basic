@@ -18,13 +18,14 @@ import LayoutAdmin from "./components/admin/LayoutAdmin";
 import "./styles/reset.scss";
 import UserTable from "./components/admin/User/UserTable";
 import BookTable from "./components/admin/Book/BookTable";
+import BookPage from "./pages/book";
 
 const Layout = () => {
   return (
     <div className="layout-app">
       <Header />
       <Outlet />
-      <Footer />
+      {/* <Footer /> */}
     </div>
   );
 };
@@ -63,6 +64,10 @@ export default function App() {
         {
           path: "contact",
           element: <ContactPage />,
+        },
+        {
+          path: "book/:slug",
+          element: <BookPage />,
         },
       ],
     },
